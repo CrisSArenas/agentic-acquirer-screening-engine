@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acquirer Identification Engine | William Blair</title>
+<style>
+:root {
+  --navy: #002C5F;
+  --navy-hover: #001E42;
+  --gold: #B8935A;
+  --gold-light: rgba(184, 147, 90, 0.12);
+  --bg: #FAFAF8;
+  --card: #FFFFFF;
+  --text: #0A1628;
+  --text2: #5A6478;
+  --border: #E8EAED;
+  --green: #1B7B47;
+  --warning: #B8500F;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font); background: var(--bg); color: var(--text);
+  line-height: 1.6; min-height: 100vh; position: relative;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background: radial-gradient(ellipse at 30% 20%, rgba(0,44,95,0.03) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 80%, rgba(184,147,90,0.02) 0%, transparent 50%);
+  pointer-events: none; z-index: 0;
+}
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+/* HEADER */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(250,250,248,0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border); padding: 16px 0;
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; }
+.wordmark { font-size: 0.8125rem; font-weight: 700; color: var(--navy); letter-spacing: 0.08em; text-transform: uppercase; }
+.header-meta { font-size: 0.8125rem; color: var(--text2); }
+.header-meta .dot { color: var(--green); font-size: 1.25rem; vertical-align: middle; margin-right: 4px; }
+
+/* HERO */
+.hero { padding: 64px 0 32px; text-align: center; }
+.hero h1 {
+  font-size: 2.5rem; font-weight: 700; letter-spacing: -0.025em;
+  color: var(--navy); margin-bottom: 10px;
+}
+.hero .subtitle {
+  font-size: 1.0625rem; color: var(--text2); max-width: 600px;
+  margin: 0 auto; line-height: 1.7;
+}
+@media (max-width: 768px) {
+  .hero { padding: 40px 0 24px; }
+  .hero h1 { font-size: 1.875rem; }
+}
+
+/* FORM */
+.setup-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 32px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+  margin-bottom: 24px;
+}
+.setup-card .label {
+  font-size: 0.6875rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text2); margin-bottom: 20px;
+}
+.form-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;
+}
+@media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+.input-group label {
+  display: block; font-size: 0.8125rem; font-weight: 500;
+  color: var(--text2); margin-bottom: 6px;
+}
+select {
+  width: 100%; padding: 10px 14px; font-size: 0.9375rem; font-family: var(--font);
+  border: 1px solid var(--border); border-radius: 8px; background: var(--card);
+  color: var(--text); outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+select:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(0,44,95,0.08); }
+
+.range-value {
+  display: inline-block; font-size: 1.5rem; font-weight: 700;
+  font-variant-numeric: tabular-nums; color: var(--navy); margin-bottom: 6px;
+}
+input[type="range"] {
+  -webkit-appearance: none; width: 100%; height: 4px; border-radius: 2px;
+  background: var(--border); outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--navy); cursor: pointer; box-shadow: 0 2px 6px rgba(0,44,95,0.25);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%; border: none;
+  background: var(--navy); cursor: pointer;
+}
+
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill {
+  padding: 6px 16px; font-size: 0.8125rem; font-weight: 500;
+  border: 1px solid var(--border); border-radius: 100px;
+  background: var(--card); color: var(--text2); cursor: pointer;
+  transition: all 0.2s; font-family: var(--font);
+}
+.pill:hover { border-color: var(--navy); color: var(--navy); }
+.pill.active { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+/* CTA */
+.cta-row { display: flex; justify-content: center; }
+.btn {
+  padding: 14px 40px; font-size: 0.9375rem; font-weight: 600; font-family: var(--font);
+  border: none; border-radius: 8px; cursor: pointer;
+  transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+  min-width: 280px; justify-content: center;
+}
+.btn-primary { background: var(--navy); color: #fff; box-shadow: 0 2px 8px rgba(0,44,95,0.2); }
+.btn-primary:hover:not(:disabled) { background: var(--navy-hover); box-shadow: 0 4px 12px rgba(0,44,95,0.3); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+/* STATUS */
+.status-bar {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 20px; margin: 16px 0; font-size: 0.875rem; color: var(--text2);
+  display: none; align-items: center; gap: 12px;
+}
+.status-bar.visible { display: flex; }
+.spinner {
+  width: 14px; height: 14px; border: 2px solid rgba(0,44,95,0.15);
+  border-top-color: var(--navy); border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.status-bar.error { background: rgba(184,80,15,0.06); border-color: rgba(184,80,15,0.3); color: var(--warning); }
+
+/* RESULTS */
+.results-section { display: none; margin-top: 32px; margin-bottom: 64px; }
+.results-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
+}
+.results-header h2 { font-size: 1.5rem; color: var(--navy); font-weight: 700; }
+.results-meta { font-size: 0.8125rem; color: var(--text2); }
+
+.metrics-strip {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px 24px; margin-bottom: 24px;
+}
+@media (max-width: 640px) { .metrics-strip { grid-template-columns: 1fr 1fr; } }
+.metric { }
+.metric-label { font-size: 0.6875rem; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.metric-value { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text); }
+
+.grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+.acquirer-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+  padding: 0; overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s, transform 0.2s; cursor: pointer;
+}
+.acquirer-card:hover { transform: translateY(-2px); box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 12px 32px rgba(0,0,0,0.10); }
+
+.card-head {
+  padding: 20px 22px 14px;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+}
+.rank-label { font-size: 0.6875rem; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+.acq-name { font-size: 1.125rem; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 4px; }
+.acq-meta { font-size: 0.75rem; color: var(--text2); }
+.conv-badge {
+  padding: 4px 12px; border-radius: 100px; font-size: 0.6875rem;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+}
+.conv-High { background: var(--gold-light); color: var(--gold); border: 1px solid rgba(184,147,90,0.25); }
+.conv-Medium { background: rgba(0,44,95,0.06); color: var(--navy); border: 1px solid rgba(0,44,95,0.15); }
+.conv-Low { background: rgba(90,100,120,0.06); color: var(--text2); border: 1px solid rgba(90,100,120,0.15); }
+
+.card-body { padding: 0 22px 16px; }
+.thesis {
+  font-size: 0.8125rem; color: var(--text2); line-height: 1.6;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card-foot {
+  padding: 10px 22px; border-top: 1px solid var(--border);
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.tx-pill {
+  font-family: 'SF Mono', Consolas, monospace; font-size: 0.625rem;
+  padding: 2px 8px; border-radius: 100px;
+  background: rgba(0,44,95,0.04); color: var(--text2); border: 1px solid var(--border);
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(10,22,40,0.4);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  display: none; align-items: flex-start; justify-content: center;
+  padding: 40px 24px; overflow-y: auto;
+}
+.modal-overlay.visible { display: flex; }
+.modal {
+  background: var(--card); border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 16px 40px rgba(0,0,0,0.15);
+  max-width: 720px; width: 100%; position: relative; margin: 40px 0;
+}
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  width: 32px; height: 32px; border: none; background: rgba(0,0,0,0.04);
+  border-radius: 50%; cursor: pointer; font-size: 1.125rem; color: var(--text2);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: rgba(0,0,0,0.08); }
+.modal-head { padding: 28px 32px 18px; border-bottom: 1px solid var(--border); }
+.modal-head-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.modal-head h2 { font-size: 1.375rem; margin-bottom: 4px; color: var(--text); }
+.modal-body { padding: 24px 32px 28px; }
+.section { margin-bottom: 22px; }
+.section:last-child { margin-bottom: 0; }
+.section-label {
+  font-size: 0.6875rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--navy); margin-bottom: 6px;
+}
+.section-body {
+  font-size: 0.9375rem; color: var(--text); line-height: 1.7; white-space: pre-wrap;
+}
+.conv-box { padding: 14px 18px; border-radius: 10px; display: flex; gap: 12px; align-items: flex-start; }
+.conv-box.High { background: var(--gold-light); border: 1px solid rgba(184,147,90,0.2); }
+.conv-box.Medium { background: rgba(0,44,95,0.04); border: 1px solid rgba(0,44,95,0.1); }
+.conv-box.Low { background: rgba(90,100,120,0.04); border: 1px solid rgba(90,100,120,0.1); }
+
+/* SKELETON */
+.skeleton { position: relative; overflow: hidden; background: rgba(0,44,95,0.03); border-radius: 6px; }
+.skeleton::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  animation: shimmer 1.8s infinite;
+}
+@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+.sk-line { height: 12px; margin-bottom: 8px; }
+.sk-line.w60 { width: 60%; }
+.sk-line.w80 { width: 80%; }
+.sk-line.w40 { width: 40%; }
+.sk-title { height: 18px; width: 65%; margin-bottom: 10px; }
+.sk-badge { height: 22px; width: 64px; border-radius: 100px; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container header-inner">
+    <div class="wordmark">William Blair</div>
+    <div class="header-meta" id="api-status"><span class="dot">&bull;</span>Connecting…</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>Acquirer Identification Engine</h1>
+    <p class="subtitle">Agentic M&amp;A acquirer screening.</p>
+  </div>
+</section>
+
+<div class="container">
+
+  <div class="setup-card">
+    <div class="label">Target Profile</div>
+    <div class="form-grid">
+      <div class="input-group">
+        <label for="target-sector">Sector</label>
+        <select id="target-sector">
+          <option>Healthcare Services</option>
+          <option>Health IT</option>
+          <option>Physician Groups</option>
+          <option>Behavioral Health</option>
+          <option>Dental</option>
+          <option>Home Health/Hospice</option>
+          <option>Revenue Cycle</option>
+          <option>Health Insurance</option>
+          <option>Medical Devices</option>
+          <option>Pharma/Biotech</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Enterprise Value</label>
+        <div class="range-value" id="ev-display">$200M</div>
+        <input type="range" id="ev-slider" min="50" max="1000" step="10" value="200">
+      </div>
+      <div class="input-group" style="grid-column: 1/-1;">
+        <label>Geography</label>
+        <div class="pills" id="geo-pills">
+          <button class="pill active" data-value="Regional">Regional</button>
+          <button class="pill" data-value="Northeast">Northeast</button>
+          <button class="pill" data-value="Southeast">Southeast</button>
+          <button class="pill" data-value="Midwest">Midwest</button>
+          <button class="pill" data-value="Southwest">Southwest</button>
+          <button class="pill" data-value="West Coast">West Coast</button>
+          <button class="pill" data-value="National">National</button>
+        </div>
+      </div>
+    </div>
+    <div class="cta-row">
+      <button class="btn btn-primary" id="run-btn">Identify Acquirers</button>
+    </div>
+  </div>
+
+  <div class="status-bar" id="status-bar">
+    <div class="spinner"></div>
+    <div id="status-text">Running agentic pipeline…</div>
+  </div>
+
+  <div class="results-section" id="results">
+    <div class="results-header">
+      <div>
+        <h2>Top Acquirers</h2>
+        <div class="results-meta" id="results-meta"></div>
+      </div>
+    </div>
+
+    <div class="metrics-strip" id="metrics-strip">
+      <div class="metric"><div class="metric-label">Duration</div><div class="metric-value" id="m-duration">—</div></div>
+      <div class="metric"><div class="metric-label">LLM Cost</div><div class="metric-value" id="m-cost">—</div></div>
+      <div class="metric"><div class="metric-label">Input Tokens</div><div class="metric-value" id="m-input">—</div></div>
+      <div class="metric"><div class="metric-label">Output Tokens</div><div class="metric-value" id="m-output">—</div></div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+const API = '';  // same origin — served by FastAPI
+let rationales = [];
+
+// Health check
+(async () => {
+  try {
+    const r = await fetch(API + '/health');
+    const j = await r.json();
+    document.getElementById('api-status').innerHTML =
+      `<span class="dot" style="color:var(--green)">&bull;</span>Connected · ${j.model}`;
+  } catch (e) {
+    document.getElementById('api-status').innerHTML =
+      `<span class="dot" style="color:var(--warning)">&bull;</span>API offline`;
+  }
+})();
+
+// EV slider
+const evSlider = document.getElementById('ev-slider');
+const evDisplay = document.getElementById('ev-display');
+evSlider.addEventListener('input', () => {
+  const v = parseInt(evSlider.value);
+  evDisplay.textContent = v >= 1000 ? `$${(v/1000).toFixed(1)}B` : `$${v}M`;
+});
+
+// Geo pills
+document.getElementById('geo-pills').addEventListener('click', e => {
+  const p = e.target.closest('.pill');
+  if (!p) return;
+  document.querySelectorAll('#geo-pills .pill').forEach(x => x.classList.remove('active'));
+  p.classList.add('active');
+});
+
+// Submit
+document.getElementById('run-btn').addEventListener('click', run);
+
+async function run() {
+  const target = {
+    sector: document.getElementById('target-sector').value,
+    size_mm: parseFloat(evSlider.value),
+    geography: document.querySelector('#geo-pills .pill.active')?.dataset.value || 'Regional',
+  };
+
+  const status = document.getElementById('status-bar');
+  const statusText = document.getElementById('status-text');
+  const results = document.getElementById('results');
+  const grid = document.getElementById('grid');
+  const btn = document.getElementById('run-btn');
+
+  status.classList.add('visible');
+  status.classList.remove('error');
+  statusText.textContent = `Running agentic pipeline for ${target.sector} at $${target.size_mm}M…`;
+  btn.disabled = true;
+  btn.textContent = 'Running…';
+
+  // Render 10 skeletons up front
+  results.style.display = 'block';
+  grid.innerHTML = Array.from({ length: 10 }, (_, i) => skeletonCard(i + 1)).join('');
+  document.getElementById('results-meta').textContent = 'Generating…';
+
+  const t0 = Date.now();
+  try {
+    const r = await fetch(API + '/api/v1/identify-acquirers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(target),
+    });
+
+    if (!r.ok) {
+      const body = await r.text();
+      throw new Error(`API ${r.status}: ${body.slice(0, 200)}`);
+    }
+    const data = await r.json();
+    rationales = data.rationales;
+    const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+
+    status.classList.remove('visible');
+    document.getElementById('results-meta').textContent =
+      `${data.rationales.length} rationales · ${target.sector} · $${target.size_mm}M EV · ${target.geography}`;
+
+    // Metrics strip
+    document.getElementById('m-duration').textContent = `${data.total_duration_seconds.toFixed(1)}s`;
+    document.getElementById('m-cost').textContent = `$${data.total_cost_usd.toFixed(4)}`;
+    document.getElementById('m-input').textContent = data.total_input_tokens.toLocaleString();
+    document.getElementById('m-output').textContent = data.total_output_tokens.toLocaleString();
+
+    // Render cards
+    grid.innerHTML = rationales.map((r, i) => rationaleCard(r, i)).join('');
+  } catch (e) {
+    status.classList.add('error');
+    statusText.textContent = `Error: ${e.message}`;
+    grid.innerHTML = '';
+    results.style.display = 'none';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Identify Acquirers';
+  }
+}
+
+function skeletonCard(rank) {
+  return `
+    <div class="acquirer-card">
+      <div class="card-head">
+        <div>
+          <div class="rank-label">Acquirer #${rank}</div>
+          <div class="skeleton sk-title"></div>
+          <div class="skeleton sk-line w40"></div>
+        </div>
+        <div class="skeleton sk-badge"></div>
+      </div>
+      <div class="card-body">
+        <div class="skeleton sk-line w80"></div>
+        <div class="skeleton sk-line w60"></div>
+        <div class="skeleton sk-line w80"></div>
+      </div>
+    </div>`;
+}
+
+function rationaleCard(r, i) {
+  const conv = r.conviction.level;
+  const ids = (r.precedent_activity.match(/MA-\d{4}-\d{4}/g) || []).slice(0, 4);
+  const thesis = r.strategic_fit_thesis.replace(/\n+/g, ' ');
+  return `
+    <div class="acquirer-card" onclick="openModal(${i})">
+      <div class="card-head">
+        <div>
+          <div class="rank-label">Acquirer #${r.rank}</div>
+          <div class="acq-name">${esc(r.acquirer_name)}</div>
+          <div class="acq-meta">Rank ${r.rank} of 10</div>
+        </div>
+        <span class="conv-badge conv-${conv}">${conv}</span>
+      </div>
+      <div class="card-body">
+        <div class="thesis">${esc(thesis)}</div>
+      </div>
+      ${ids.length ? `<div class="card-foot">${ids.map(id => `<span class="tx-pill">${id}</span>`).join('')}</div>` : ''}
+    </div>`;
+}
+
+function openModal(i) {
+  const r = rationales[i];
+  const conv = r.conviction.level;
+  document.getElementById('modal-content').innerHTML = `
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div class="modal-head">
+      <div class="rank-label">Acquirer #${r.rank}</div>
+      <div class="modal-head-top">
+        <h2>${esc(r.acquirer_name)}</h2>
+        <span class="conv-badge conv-${conv}">${conv}</span>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="section"><div class="section-label">Acquirer Overview</div><div class="section-body">${esc(r.acquirer_overview)}</div></div>
+      <div class="section"><div class="section-label">Strategic Fit Thesis</div><div class="section-body">${esc(r.strategic_fit_thesis)}</div></div>
+      <div class="section"><div class="section-label">Precedent Activity</div><div class="section-body">${esc(r.precedent_activity)}</div></div>
+      <div class="section"><div class="section-label">Valuation Context</div><div class="section-body">${esc(r.valuation_context)}</div></div>
+      <div class="section"><div class="section-label">Risk Flags</div><div class="section-body">${esc(r.risk_flags)}</div></div>
+      <div class="section">
+        <div class="section-label">Conviction</div>
+        <div class="conv-box ${conv}">
+          <span class="conv-badge conv-${conv}" style="flex-shrink:0">${conv}</span>
+          <div class="section-body">${esc(r.conviction.rationale)}</div>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('visible');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>
