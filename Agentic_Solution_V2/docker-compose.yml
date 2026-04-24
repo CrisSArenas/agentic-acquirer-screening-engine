@@ -1,0 +1,29 @@
+# One-command local deployment: `docker compose up`
+# Brings up the API and a Redis cache (placeholder for the V2 caching layer).
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - MODEL=claude-sonnet-4-6
+      - LOG_LEVEL=INFO
+      - LOG_JSON=true
+      - CSV_PATH=data/ma_transactions_500.csv
+      - MAX_CONCURRENT_REQUESTS=5
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+
+volumes:
+  redis-data:
