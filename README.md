@@ -135,19 +135,19 @@ All ten per-acquirer agents run concurrently via `asyncio.gather` with a `Semaph
 │                                                                  │
 │  Stage 1: Deterministic                                          │
 │  ├─ evidence.build_evidence_packets(df, target)                  │
-│  ├─ scoring.rank_acquirers(packets, target) → top 10             │
-│  └─ scoring.compute_conviction(packet, target) → H/M/L           │
+│  ├─ scoring.rank_acquirers(packets, target) -> top 10             │
+│  └─ scoring.compute_conviction(packet, target) -> H/M/L           │
 │                                                                  │
 │  Stage 2: Agentic (asyncio.gather + Semaphore)                   │
 │  For each of top 10, concurrently:                               │
 │    ├─ Pre-load evidence + transactions + gate detail             │
 │    ├─ Agent loop (max 4 iterations):                             │
 │    │   ├─ call_claude(tools=TOOL_SCHEMAS)                        │
-│    │   ├─ if stop_reason == "tool_use" → dispatch → loop         │
-│    │   └─ if stop_reason == "end_turn" → break                   │
+│    │   ├─ if stop_reason == "tool_use" -> dispatch -> loop         │
+│    │   └─ if stop_reason == "end_turn" -> break                   │
 │    ├─ Extract JSON from response (brace-matched)                 │
 │    ├─ Validate via AcquirerRationale Pydantic schema             │
-│    └─ On validation failure → repair loop (one shot)             │
+│    └─ On validation failure -> repair loop (one shot)             │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -174,7 +174,7 @@ All ten per-acquirer agents run concurrently via `asyncio.gather` with a `Semaph
 ```bash
 # Clone the repository
 git clone <your-repo-url>
-cd Agentic_Solution_V2
+cd agentic-acquirer-screening-engine
 
 # Create and activate a virtual environment
 python -m venv venv
@@ -259,7 +259,7 @@ The response is the complete `RationaleSet`: ten validated rationales, total cos
 ## Project Structure
 
 ```
-Agentic_Solution_V2/
+agentic-acquirer-screening-engine/
 ├── src/acquirer_engine/          # Application package (9 modules)
 │   ├── __init__.py
 │   ├── config.py                 # Pydantic Settings — loads .env
@@ -370,7 +370,7 @@ Target architecture for full production once pilot adoption justifies the infras
 - **LLM runtime**: AWS Bedrock (keeps data inside the VPC for compliance)
 - **Observability**: LangSmith + CloudWatch + X-Ray
 - **Orchestration upgrade**: LangGraph with a critic agent validating the rationale writer's output as a separate call
-- **Feedback loop**: SQS → Lambda → SageMaker for preference-pair training on accumulated user feedback
+- **Feedback loop**: SQS -> Lambda -> SageMaker for preference-pair training on accumulated user feedback
 
 Estimated operating cost: $800–$1,500/month at 200 users with ~500 runs per day, after cache warm-up.
 
