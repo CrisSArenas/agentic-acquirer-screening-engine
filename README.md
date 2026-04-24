@@ -135,19 +135,19 @@ All ten per-acquirer agents run concurrently via `asyncio.gather` with a `Semaph
 │                                                                  │
 │  Stage 1: Deterministic                                          │
 │  ├─ evidence.build_evidence_packets(df, target)                  │
-│  ├─ scoring.rank_acquirers(packets, target) -> top 10             │
-│  └─ scoring.compute_conviction(packet, target) -> H/M/L           │
+│  ├─ scoring.rank_acquirers(packets, target) -> top 10            │
+│  └─ scoring.compute_conviction(packet, target) -> H/M/L          │
 │                                                                  │
 │  Stage 2: Agentic (asyncio.gather + Semaphore)                   │
 │  For each of top 10, concurrently:                               │
 │    ├─ Pre-load evidence + transactions + gate detail             │
 │    ├─ Agent loop (max 4 iterations):                             │
 │    │   ├─ call_claude(tools=TOOL_SCHEMAS)                        │
-│    │   ├─ if stop_reason == "tool_use" -> dispatch -> loop         │
-│    │   └─ if stop_reason == "end_turn" -> break                   │
+│    │   ├─ if stop_reason == "tool_use" -> dispatch -> loop       │
+│    │   └─ if stop_reason == "end_turn" -> break                  │
 │    ├─ Extract JSON from response (brace-matched)                 │
 │    ├─ Validate via AcquirerRationale Pydantic schema             │
-│    └─ On validation failure -> repair loop (one shot)             │
+│    └─ On validation failure -> repair loop (one shot)            │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
