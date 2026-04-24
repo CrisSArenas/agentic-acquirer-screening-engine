@@ -497,5 +497,3 @@ This repository is a portfolio/demonstration project. If you'd like to extend it
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](./LICENSE) for the full text.
-
-In short: you can use, copy, modify, and distribute this code freely, including for commercial purposes, as long as the copyright notice and license text are included. The software is provided "as is" with no warranty.
