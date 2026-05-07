@@ -23,6 +23,7 @@ COPY --from=builder /install /usr/local
 COPY src/ ./src/
 COPY data/ ./data/
 COPY run_api.py .
+COPY frontend/ ./frontend/
 
 # Security: run as non-root
 RUN useradd -r -u 1000 appuser && chown -R appuser:appuser /app
